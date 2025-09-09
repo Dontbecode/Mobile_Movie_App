@@ -34,9 +34,11 @@ export default function Index() {
         <Image source={icons.logo} className="w-12 h-10 mt-20 mb-5 mx-auto" />
         
         {/* SearchBar cukup satu kali di atas */}
-        <SearchBar
-          onPress={() => router.push("/search")}
+        <SearchBar  
           placeholder="Search for movie"
+          value=""
+          onChangeText={() => {}}
+          onPress={() => router.push("/search")}
         />
 
         {moviesLoading ? (
