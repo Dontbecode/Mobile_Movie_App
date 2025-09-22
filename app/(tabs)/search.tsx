@@ -2,11 +2,11 @@ import MovieCard from '@/components/MovieCard';
 import SearchBar from '@/components/SearchBar';
 import { icons } from '@/constants/icons';
 import { fetchMovies } from '@/services/api';
+import { updateSearchCount } from '@/services/appwrite';
 import useFetch from '@/services/useFetch';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, Image, Text, View } from 'react-native';
 import { images } from '../../constants/images';
-
 
 const Search = () => {
     const [searchQuery, setSearchQuery] = useState('');
@@ -33,16 +33,24 @@ const Search = () => {
     }, 500);
 
     return () => clearTimeout(timeoutId);
-    }, [searchQuery]);
+    }, [searchQuery, loadMovies, reset]);
+
+   
+
+    useEffect(() => {
+      if (movies?.length && movies[0]) {
+        updateSearchCount(searchQuery, movies[0]);
+      }
+    }, [movies, searchQuery]);
 
   return (
     <View className="flex-1 bg-primary">
-      <Image source={images.bg} className="absolute w-full z-0" resizeMode="cover"/>
+      <Image source={images.bg} className="absolute w-full h-full z-0" resizeMode="cover"/>
     
       <FlatList 
        data={movies} 
        renderItem={({ item }) => <MovieCard { ...item} /> } 
-       keyExtractor={(item) => item.id.toString()}
+       keyExtractor={(item, idx) => item.id?.toString?.() ?? idx.toString()}
        className="px-5"
        numColumns={3}
        columnWrapperStyle={{
