@@ -8,7 +8,7 @@ import { Image, Text, TouchableOpacity, View } from 'react-native'
 const TrendingCard = ({movie: { movie_id, title, poster_url}, index}: TrendingCardProps) => {
   return (
    <Link href={`/movies/${movie_id}`} asChild>
-        <TouchableOpacity className='w-32 relative pl-5'>
+        <TouchableOpacity className='w-32 relative'>
             <Image 
                 source={{ uri: poster_url}}
                 className="w-32 h-48 rounded-lg"    

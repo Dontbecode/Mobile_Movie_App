@@ -3,10 +3,12 @@ import SearchBar from "@/components/SearchBar";
 import TrendingCard from "@/components/TrendingCard";
 import { icons } from "@/constants/icons";
 import { images } from "@/constants/images";
+import type { TrendingMovie } from "@/interfaces/interfaces";
 import { fetchMovies } from "@/services/api";
 import { getTrendingMovies } from "@/services/appwrite";
 import useFetch from "@/services/useFetch";
 import { useRouter } from "expo-router";
+import React, { useMemo } from "react";
 import { ActivityIndicator, FlatList, Image, ScrollView, Text, View } from "react-native";
 
 export default function Index() {
@@ -17,6 +19,18 @@ export default function Index() {
     loading: trendingLoading,
     error: trendingError
   } = useFetch(getTrendingMovies);  
+
+  const uniqueTrending: TrendingMovie[] = useMemo(() => {
+    if (!Array.isArray(trendingMovies)) return [] as TrendingMovie[];
+    const idToDoc = new Map<number, TrendingMovie>();
+    for (const doc of trendingMovies) {
+      const existing = idToDoc.get(doc.movie_id);
+      if (!existing || (doc.count ?? 0) > (existing.count ?? 0)) {
+        idToDoc.set(doc.movie_id, doc);
+      }
+    }
+    return Array.from(idToDoc.values());
+  }, [trendingMovies]);
 
   const {
     data: movies, 
@@ -62,11 +76,12 @@ export default function Index() {
                   showsHorizontalScrollIndicator={false}
                   ItemSeparatorComponent={() => <View className="w-4" /> }
                   className="mb-4 mt-3"
-                  data={trendingMovies}
+                  data={uniqueTrending}
                   renderItem={({ item, index }) => (
                     <TrendingCard movie={item} index={index} />
                   )}
-                  keyExtractor={(item, idx) => item.movie_id?.toString?.() ?? idx.toString()}
+                  keyExtractor={(item, idx) => `${item.movie_id?.toString?.() ?? 'unknown'}-${idx}`}
+                  contentContainerStyle={{ paddingHorizontal: 20 }}
                 />
               </>
             )}
@@ -80,7 +95,7 @@ export default function Index() {
                     {...item}
                   />
                 )}
-                keyExtractor={(item, idx) => item.id?.toString?.() ?? idx.toString()}
+                keyExtractor={(item, idx) => `${item.id?.toString?.() ?? 'unknown'}-${idx}`}
                 numColumns={3}
                 columnWrapperStyle={{
                   justifyContent: 'flex-start',
