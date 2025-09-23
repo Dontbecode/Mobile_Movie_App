@@ -1,4 +1,4 @@
-import type { Movie } from "@/interfaces/interfaces";
+import type { Movie, MovieDetails } from "@/interfaces/interfaces";
 
 export const TMDB_CONFIG = {
     BASE_URL: 'https://api.themoviedb.org/3',
@@ -29,3 +29,28 @@ export const fetchMovies = async ({ query }: {query: string }): Promise<Movie[]>
     const data = await response.json();
     return (data?.results ?? []) as Movie[];
 }
+
+
+
+
+export const fetchMovieDetails = async (movieId: string): Promise<MovieDetails> => {
+    try {
+        const response = await fetch(
+            `${TMDB_CONFIG.BASE_URL}/movie/${movieId}`,
+            {
+                method: 'GET',
+                headers: TMDB_CONFIG.headers,
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error(`Gagal mengambil detail film: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        return data as MovieDetails;
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+};
